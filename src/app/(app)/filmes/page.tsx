@@ -48,7 +48,6 @@ function Conteudo() {
   return (
     <>
       <div className="app-card">
-        {/* HEADER */}
         <div
           style={{
             display: 'flex',
@@ -59,7 +58,6 @@ function Conteudo() {
         >
           <h2>🎬 Filmes</h2>
 
-          {/* 🔍 BUSCA */}
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input
               type="text"
@@ -95,7 +93,6 @@ function Conteudo() {
           )}
         </div>
 
-        {/* LISTAGEM */}
         {isAdmin ? (
           <TabelaFilmes
             dados={filmes}
@@ -106,7 +103,6 @@ function Conteudo() {
           <CardFilmes dados={filmes} />
         )}
 
-        {/* PAGINAÇÃO */}
         <div
           style={{
             display: 'flex',
@@ -137,7 +133,6 @@ function Conteudo() {
         </div>
       </div>
 
-      {/* MODAL */}
       <Modal
         aberto={modalAberto}
         titulo={editando ? 'Editar Filme' : 'Cadastrar Filme'}

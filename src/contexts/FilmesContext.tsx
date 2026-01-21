@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
 } from 'react';
 import type { Filme } from '../types/Filme';
 import {
@@ -17,20 +18,16 @@ import {
 
 type FilmesContextType = {
   filmes: Filme[];
-
-  // CRUD
   salvar: (filme: Filme) => Promise<void>;
   remover: (id: number) => Promise<void>;
   editar: (filme: Filme | null) => void;
   editando: Filme | null;
 
-  // Paginação
   page: number;
   totalPages: number;
   proximaPagina: () => void;
   paginaAnterior: () => void;
 
-  // Busca
   termoBusca: string;
   setTermoBusca: (valor: string) => void;
   executarBusca: () => Promise<void>;
@@ -42,46 +39,54 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
   const [filmes, setFilmes] = useState<Filme[]>([]);
   const [editando, setEditando] = useState<Filme | null>(null);
 
-  // Paginação
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  // Busca
   const [termoBusca, setTermoBusca] = useState('');
+  const [emBusca, setEmBusca] = useState(false);
 
-  const buscarPagina = async (p: number) => {
 
-    if (termoBusca.trim()) {
-      const data = await listarFilmesSearch(termoBusca, p, 8);
+  const carregandoRef = useRef(false);
 
-      setFilmes(data);
-
-      setTotalPages(1);
-      return;
-    }
-
+  const carregarLista = async (p: number) => {
     const response = await listarFilmesPaginado(p, 8);
     setFilmes(response.content);
     setTotalPages(response.totalPages);
   };
 
+
+  const carregarBusca = async (p: number) => {
+    const data = await listarFilmesSearch(termoBusca, p, 8);
+    setFilmes(data);
+    setTotalPages(1);
+  };
+
   useEffect(() => {
-    let ativo = true;
+    if (carregandoRef.current) return;
+
+    carregandoRef.current = true;
 
     (async () => {
-      if (!ativo) return;
-      await buscarPagina(page);
+      if (emBusca) {
+        await carregarBusca(page);
+      } else {
+        await carregarLista(page);
+      }
+      carregandoRef.current = false;
     })();
-
-    return () => {
-      ativo = false;
-    };
-  }, [page, termoBusca]);
+  }, [page]);
 
 
   const executarBusca = async () => {
+    const ativo = !!termoBusca.trim();
+    setEmBusca(ativo);
     setPage(0);
-    await buscarPagina(0);
+
+    if (ativo) {
+      await carregarBusca(0);
+    } else {
+      await carregarLista(0);
+    }
   };
 
   const salvar = async (filme: Filme) => {
@@ -91,7 +96,12 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
       await criarFilme(filme);
     }
 
-    await buscarPagina(page);
+    if (emBusca) {
+      await carregarBusca(page);
+    } else {
+      await carregarLista(page);
+    }
+
     setEditando(null);
   };
 
@@ -99,15 +109,18 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
     if (!confirm('Deseja remover este filme?')) return;
 
     await excluirFilme(id);
-    await buscarPagina(page);
+
+    if (emBusca) {
+      await carregarBusca(page);
+    } else {
+      await carregarLista(page);
+    }
   };
 
-  const editar = (filme: Filme | null) => {
-    setEditando(filme);
-  };
+  const editar = (filme: Filme | null) => setEditando(filme);
 
   const proximaPagina = () => {
-    setPage(p => (p + 1 < totalPages ? p + 1 : p));
+    setPage(p => p + 1);
   };
 
   const paginaAnterior = () => {

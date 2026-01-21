@@ -1,210 +1,189 @@
+
 # 🎬 CineTrack – Frontend
 
-Frontend da aplicação **CineTrack**, desenvolvido com **React**, **TypeScript** e **Next.js**, responsável pela interface do usuário e pela integração com a API REST desenvolvida em **Spring Boot**.
+Este projeto consiste no frontend da aplicação **CineTrack**, desenvolvido com **React**, **TypeScript** e **Next.js**.  
+O frontend é responsável por consumir a API REST desenvolvida em **Spring Boot**, oferecendo uma interface moderna, segura e organizada para gerenciamento de filmes.
 
-O frontend consome os serviços do backend de forma segura, utilizando **autenticação JWT**, **controle de acesso por roles** e boas práticas de organização e gerenciamento de estado.
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-- React
-- TypeScript
-- Next.js (App Router)
-- Context API
-- Consumo de API REST (HTTP)
-- Autenticação com JWT
-- Controle de acesso por perfil (ROLE_USER / ROLE_ADMIN)
-- CSS customizado
+A aplicação implementa autenticação via JWT, controle de acesso por perfil e um CRUD completo de filmes, seguindo boas práticas de desenvolvimento frontend.
 
 ---
 
-## 🏗️ Estrutura do Projeto
+## 🧱 Organização do Projeto
 
-O projeto utiliza a estrutura do **Next.js App Router**, organizada da seguinte forma:
+O projeto está estruturado de forma a facilitar a manutenção e evolução do código, separando responsabilidades entre:
 
-```text
-src/
-├── app/
-│   ├── (auth)/
-│   │   └── login/
-│   │       └── page.tsx
-│   ├── (app)/
-│   │   └── filmes/
-│   │       └── page.tsx
-│   ├── layout.tsx
-│   └── page.tsx
-│
-├── components/
-│   ├── CardFilmes.tsx
-│   ├── FormularioFilme.tsx
-│   ├── Modal.tsx
-│   ├── ProtectedRoute.tsx
-│   └── TabelaFilmes.tsx
-│
-├── contexts/
-│   ├── AuthContext.tsx
-│   └── FilmesContext.tsx
-│
-├── services/
-│   ├── api.ts
-│   ├── auth.services.ts
-│   └── filmes.service.ts
-│
-├── styles/
-├── types/
-└── utils/
-    └── authStorage.ts
-Essa organização facilita a manutenção do código, separando responsabilidades entre páginas, componentes, contexto global e serviços de integração com a API.
+- Páginas
+- Componentes reutilizáveis
+- Contextos globais
+- Serviços de integração com a API
 
-🔐 Autenticação e Autorização
-Login
-O frontend possui uma tela de login, onde o usuário informa suas credenciais.
-Essas informações são enviadas para o backend através do endpoint de autenticação.
+Essa separação garante maior legibilidade, reutilização de código e facilidade de manutenção.
 
-Endpoint consumido:
+---
 
-http
-Copiar código
+## 🔐 Autenticação e Autorização
+
+### Login
+
+O frontend possui uma tela de login onde o usuário informa suas credenciais.  
+Essas informações são enviadas ao backend através do endpoint de autenticação.
+
+**Endpoint consumido:**
+```
 POST /auth/login
-Após o login:
+```
 
-O backend retorna um token JWT
+### Após o login
 
-Retorna também as roles do usuário
+- O backend retorna um **token JWT**
+- Retorna também as **roles do usuário**
+- O token e as roles são armazenados no **localStorage**
 
-O token e as roles são armazenados no localStorage
-
-Arquivo responsável:
-
-bash
-Copiar código
+**Arquivo responsável:**
+```
 utils/authStorage.ts
-Contexto de Autenticação
-A autenticação é gerenciada globalmente através do AuthContext, que controla:
+```
 
-Token JWT
+---
 
-Roles do usuário
+## 🔑 Contexto de Autenticação
 
-Estado de autenticação
+A autenticação é gerenciada globalmente através do **AuthContext**, responsável por controlar:
 
-Login e logout
+- Token JWT
+- Roles do usuário
+- Estado de autenticação
+- Login e logout
+- Verificação de permissões
 
-Verificação de permissões
-
-Arquivo:
-
-Copiar código
+**Arquivo:**
+```
 contexts/AuthContext.tsx
-Controle de Rotas Protegidas
-O acesso às páginas protegidas é feito utilizando o componente ProtectedRoute, que verifica se o usuário está autenticado antes de permitir o acesso.
+```
 
-Arquivo:
+---
 
-Copiar código
-components/ProtectedRoute.tsx
+## 🔒 Controle de Rotas Protegidas
+
+O acesso às páginas protegidas é realizado por meio do componente **ProtectedRoute**, que verifica se o usuário está autenticado antes de permitir o acesso.
+
 Usuários não autenticados são redirecionados automaticamente para a tela de login.
 
-🎥 Funcionalidades da Aplicação
-Listagem de Filmes
-Usuários autenticados podem visualizar os filmes cadastrados
+**Arquivo:**
+```
+components/ProtectedRoute.tsx
+```
 
-A listagem suporta paginação
+---
 
-É possível realizar busca por texto
+## 🎥 Funcionalidades da Aplicação
 
-Busca de Filmes
-A busca é integrada ao backend utilizando parâmetros de consulta, permitindo filtrar os filmes pelo texto informado.
+### 📄 Listagem de Filmes
 
-Controle de Acesso por Perfil
-O frontend controla visualmente as funcionalidades com base nas roles:
+- Usuários autenticados podem visualizar os filmes cadastrados
+- A listagem suporta paginação
+- É possível realizar busca por texto
 
-ROLE_USER
-Visualização dos filmes em formato de cards
+### 🔍 Busca de Filmes
 
-ROLE_ADMIN
-Visualização em tabela
+A busca é realizada de forma explícita, sendo executada apenas ao clicar no botão de busca.  
+O frontend envia o termo de pesquisa ao backend utilizando parâmetros de consulta.
 
-Criação de novos filmes
+### 🧑‍💼 Controle de Acesso por Perfil
 
-Edição de filmes existentes
+O frontend controla visualmente as funcionalidades com base nas **roles** retornadas no login.
 
-Exclusão de filmes
+**ROLE_USER**
+- Visualização dos filmes em formato de cards
 
-Esse controle é feito utilizando as roles retornadas no login.
+**ROLE_ADMIN**
+- Visualização dos filmes em tabela
+- Criação de novos filmes
+- Edição de filmes existentes
+- Exclusão de filmes
 
-Cadastro e Edição de Filmes
-Disponível apenas para usuários ADMIN
+---
 
-Utiliza um Modal com formulário reutilizável
+## 📝 Cadastro e Edição de Filmes
 
-Integração direta com a API REST do backend
+- Funcionalidade disponível apenas para usuários com perfil **ADMIN**
+- Utiliza um modal com formulário reutilizável
+- Integração direta com a API REST do backend
 
-Componentes envolvidos:
-
-mathematica
-Copiar código
+**Componentes envolvidos:**
+```
 FormularioFilme.tsx
 Modal.tsx
 TabelaFilmes.tsx
-🔗 Integração com o Backend
-O frontend consome a API REST desenvolvida em Spring Boot, utilizando os seguintes endpoints:
+```
 
-http
-Copiar código
+---
+
+## 🔗 Integração com o Backend
+
+O frontend consome a API REST desenvolvida em **Spring Boot**, utilizando os seguintes endpoints:
+
+```
 GET    /api/filmes
 GET    /api/filmes/search
 POST   /api/filmes
 PUT    /api/filmes/{id}
 DELETE /api/filmes/{id}
-Os serviços de integração estão centralizados na pasta:
+```
 
-Copiar código
+Os serviços de integração com a API estão centralizados na pasta:
+
+```
 services/
-Isso garante reaproveitamento de código e facilidade de manutenção.
+```
 
-▶️ Como Executar o Frontend Localmente
-Pré-requisitos
-Node.js (versão 18 ou superior)
+Essa abordagem garante reaproveitamento de código e facilidade de manutenção.
 
-npm ou yarn
+---
 
-Backend em execução
+## ▶️ Como Executar o Frontend Localmente
 
-Passos para Execução
-Clonar o repositório:
+### Pré-requisitos
 
-bash
-Copiar código
+- Node.js (versão 18 ou superior)
+- npm ou yarn
+- Backend em execução
+
+### Passos para Execução
+
+1. Clonar o repositório:
+```
 git clone https://github.com/SEU_USUARIO/seu-repo-frontend.git
-Acessar o diretório do projeto:
+```
 
-bash
-Copiar código
+2. Acessar o diretório do projeto:
+```
 cd seu-repo-frontend
-Instalar as dependências:
+```
 
-bash
-Copiar código
+3. Instalar as dependências:
+```
 npm install
-Executar a aplicação:
+```
 
-bash
-Copiar código
+4. Executar a aplicação:
+```
 npm run dev
-Acesso à Aplicação
+```
+
+### Acesso à Aplicação
+
 Após a execução, o frontend estará disponível em:
-
-arduino
-Copiar código
+```
 http://localhost:3000
-O frontend se comunica com o backend rodando em:
+```
 
-arduino
-Copiar código
-http://localhost:8080
-Caso necessário, a URL do backend pode ser configurada via variável de ambiente.
+O frontend se comunica com o backend rodando localmente, geralmente acessível pela porta **8080**.
 
-🧪 Considerações Finais
-O frontend foi desenvolvido utilizando React com TypeScript e Next.js, permitindo a criação de uma interface moderna, organizada e segura. A aplicação está totalmente integrada ao backend em Spring Boot, atendendo aos requisitos de um projeto full stack, com controle de acesso, autenticação JWT e boas práticas de desenvolvimento.
+---
+
+## 🧪 Considerações Finais
+
+O frontend foi desenvolvido utilizando **React com TypeScript e Next.js**, permitindo a criação de uma interface moderna, organizada e segura.
+
+A aplicação atende aos requisitos de um projeto **full stack**, implementando autenticação JWT, controle de acesso por perfil e boas práticas de desenvolvimento frontend.
