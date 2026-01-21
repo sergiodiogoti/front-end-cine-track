@@ -1,0 +1,46 @@
+/* Botão base */
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+/* Botão primário (azul) */
+.btn-primary {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Botão perigo (logout, excluir) */
+.btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* Botão atenção (alterar, verificar) */
+.btn-warn {
+  background: #fac20c;
+  color: #181616;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* Botão ação na página (novo filme) */
+.btn-action {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn-action:hover {
+  background: #1d4ed8;
+}
