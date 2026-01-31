@@ -24,17 +24,14 @@ export const listarFilmesPorId = async (id: number): Promise<Filme> => {
 };
 
 export const listarFilmesSearch = async (
-  texto: string,
-  page = 0,
-  size = 8
-) => {
-  const { data } = await api.get('/api/filmes/search', {
-    params: { texto, page, size },
+  query: string
+): Promise<Filme[]> => {
+  const { data } = await api.get<Filme[]>('/api/filmes/search', {
+    params: { query },
   });
 
   return data;
 };
-
 
 export const criarFilme = async (filme: Filme): Promise<Filme> => {
   const { data } = await api.post<Filme>('/api/filmes', filme);

@@ -31,6 +31,7 @@ type FilmesContextType = {
   termoBusca: string;
   setTermoBusca: (valor: string) => void;
   executarBusca: () => Promise<void>;
+  limparBusca: () => Promise<void>;
 };
 
 const FilmesContext = createContext<FilmesContextType | null>(null);
@@ -45,22 +46,23 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
   const [termoBusca, setTermoBusca] = useState('');
   const [emBusca, setEmBusca] = useState(false);
 
-
   const carregandoRef = useRef(false);
 
+  //LISTAGEM NORMAL (MYSQL)
   const carregarLista = async (p: number) => {
     const response = await listarFilmesPaginado(p, 8);
     setFilmes(response.content);
     setTotalPages(response.totalPages);
   };
 
-
-  const carregarBusca = async (p: number) => {
-    const data = await listarFilmesSearch(termoBusca, p, 8);
+  //BUSCA (ELASTICSEARCH)
+  const carregarBusca = async () => {
+    const data = await listarFilmesSearch(termoBusca);
     setFilmes(data);
-    setTotalPages(1);
+    setTotalPages(1); // busca não pagina (por enquanto)
   };
 
+  //CONTROLE CENTRAL DE CARREGAMENTO
   useEffect(() => {
     if (carregandoRef.current) return;
 
@@ -68,27 +70,36 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
 
     (async () => {
       if (emBusca) {
-        await carregarBusca(page);
+        await carregarBusca();
       } else {
         await carregarLista(page);
       }
       carregandoRef.current = false;
     })();
-  }, [page]);
-
+  }, [page, emBusca]);
 
   const executarBusca = async () => {
     const ativo = !!termoBusca.trim();
-    setEmBusca(ativo);
-    setPage(0);
 
-    if (ativo) {
-      await carregarBusca(0);
-    } else {
-      await carregarLista(0);
+    if (!ativo) {
+      await limparBusca();
+      return;
     }
+
+    setEmBusca(true);
+    setPage(0);
+    await carregarBusca();
   };
 
+  //LIMPA BUSCA E VOLTA PARA MYSQL
+  const limparBusca = async () => {
+    setEmBusca(false);
+    setTermoBusca('');
+    setPage(0);
+    await carregarLista(0);
+  };
+
+  //SALVAR (MYSQL + REINDEXAÇÃO AUTOMÁTICA NO BACKEND)
   const salvar = async (filme: Filme) => {
     if (filme.id) {
       await atualizarFilme(filme.id, filme);
@@ -97,7 +108,7 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (emBusca) {
-      await carregarBusca(page);
+      await carregarBusca();
     } else {
       await carregarLista(page);
     }
@@ -105,13 +116,14 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
     setEditando(null);
   };
 
+  // REMOVER
   const remover = async (id: number) => {
     if (!confirm('Deseja remover este filme?')) return;
 
     await excluirFilme(id);
 
     if (emBusca) {
-      await carregarBusca(page);
+      await carregarBusca();
     } else {
       await carregarLista(page);
     }
@@ -120,11 +132,11 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
   const editar = (filme: Filme | null) => setEditando(filme);
 
   const proximaPagina = () => {
-    setPage(p => p + 1);
+    if (!emBusca) setPage(p => p + 1);
   };
 
   const paginaAnterior = () => {
-    setPage(p => (p > 0 ? p - 1 : p));
+    if (!emBusca) setPage(p => (p > 0 ? p - 1 : p));
   };
 
   return (
@@ -142,6 +154,7 @@ export function FilmesProvider({ children }: { children: React.ReactNode }) {
         termoBusca,
         setTermoBusca,
         executarBusca,
+        limparBusca,
       }}
     >
       {children}

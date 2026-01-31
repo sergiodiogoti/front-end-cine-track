@@ -26,6 +26,7 @@ function Conteudo() {
     termoBusca,
     setTermoBusca,
     executarBusca,
+    limparBusca, 
   } = useFilmes();
 
   const [modalAberto, setModalAberto] = useState(false);
@@ -45,6 +46,14 @@ function Conteudo() {
     setModalAberto(true);
   };
 
+  const buscar = async () => {
+    if (!termoBusca.trim()) {
+      limparBusca();
+      return;
+    }
+    await executarBusca();
+  };
+
   return (
     <>
       <div className="app-card">
@@ -57,26 +66,27 @@ function Conteudo() {
           }}
         >
           <h2>🎬 Filmes</h2>
-
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input
               type="text"
-              placeholder="Buscar"
+              placeholder="Buscar por título, gênero ou sinopse"
               value={termoBusca}
               onChange={e => setTermoBusca(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && buscar()}
               style={{
                 height: 40,
                 padding: '0 12px',
                 borderRadius: 6,
                 border: '1px solid #ccc',
-                minWidth: 260,
+                minWidth: 280,
               }}
             />
 
             <button
               className="btn"
               style={{ height: 40 }}
-              onClick={executarBusca}
+              onClick={buscar}
+              title="Buscar no Elasticsearch"
             >
               <HiOutlineMagnifyingGlass size={18} />
             </button>

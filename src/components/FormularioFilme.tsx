@@ -101,7 +101,7 @@ export default function FormularioFilme({ aoEnviar, editando }: Props) {
         </div>
 
         <div className="form-campo form-full">
-          <label>Crítica</label>
+          <label>Sinopse</label>
           <textarea
             name="sinopse"
             rows={3}
