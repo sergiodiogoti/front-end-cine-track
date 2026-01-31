@@ -153,7 +153,7 @@ Essa abordagem garante reaproveitamento de código e facilidade de manutenção.
 
 1. Clonar o repositório:
 ```
-git clone https://github.com/SEU_USUARIO/seu-repo-frontend.git
+ https://github.com/sergiodiogoti/front-end-cine-track.git
 ```
 
 2. Acessar o diretório do projeto:
@@ -186,4 +186,3 @@ O frontend se comunica com o backend rodando localmente, geralmente acessível p
 
 O frontend foi desenvolvido utilizando **React com TypeScript e Next.js**, permitindo a criação de uma interface moderna, organizada e segura.
 
-A aplicação atende aos requisitos de um projeto **full stack**, implementando autenticação JWT, controle de acesso por perfil e boas práticas de desenvolvimento frontend.
