@@ -33,6 +33,13 @@ Essas informações são enviadas ao backend através do endpoint de autenticaç
 POST /auth/login
 ```
 
+### 👤 Usuários Padrão
+
+| Usuário | Senha  | Role       |
+| ------- | ------ | ---------- |
+| admin   | 123456 | ROLE_ADMIN |
+| user    | 123456 | ROLE_USER  |
+
 ### Após o login
 
 - O backend retorna um **token JWT**
